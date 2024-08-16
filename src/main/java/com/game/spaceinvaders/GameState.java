@@ -253,8 +253,10 @@ public class GameState {
 
 
 
+
         boolean isHit = isBetween(ship.getRow() - shipWidth / 2, ship.getRow() + shipWidth / 2, projectile.getRow())
                 && isBetween(ship.getCol() - shipHeight / 2, ship.getCol() + shipHeight / 2, projectile.getCol());
+
 
 
 

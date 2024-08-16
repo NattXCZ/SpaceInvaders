@@ -63,6 +63,7 @@ public class GameObject {
 
 
     //size
+
     /*public final IntegerProperty sizeProperty() {
         return this.size;
     }

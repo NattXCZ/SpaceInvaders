@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 public class Wall{
 
+
     private final BooleanProperty active;
     private final IntegerProperty lives;
     private final IntegerProperty row;
