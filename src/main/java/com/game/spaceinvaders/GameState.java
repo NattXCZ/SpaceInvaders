@@ -51,7 +51,7 @@ public class GameState {
     }
     private void createAddInvaders() {
         int startX = 50;  // počáteční X pozice pro první invader
-        int startY = 50;  // počáteční Y pozice pro první řádek
+        int startY = 80;  // počáteční Y pozice pro první řádek
         int spacingX = ALIEN_SHIP_WIDTH + 20;  // horizontální mezera mezi invadery
         int spacingY = ALIEN_SHIP_HEIGHT + 20;  // vertikální mezera mezi řádky
 

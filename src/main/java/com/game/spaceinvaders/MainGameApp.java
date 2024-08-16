@@ -35,6 +35,11 @@ public class MainGameApp extends Application {
     private static final String PLAYER_IMAGE_PATH = "/com/game/spaceinvaders/ship70x86.png";
     private static final String INVADER_IMAGE_PATH = "/com/game/spaceinvaders/alien64x48.png";
 
+    private static final String PLAYER_IMAGE_FULL = "/com/game/spaceinvaders/ship70x86.png";
+    private static final String PLAYER_IMAGE_DAMAGED = "/com/game/spaceinvaders/ship70x86dmg2.png";
+    private static final String PLAYER_IMAGE_CRITICAL = "/com/game/spaceinvaders/ship70x86dmg3.png";
+
+    private ImageView playerImageView;
 
 
 
@@ -65,7 +70,21 @@ public class MainGameApp extends Application {
         gameState = new GameState();
         manageTexts();
 
-        root.getChildren().add(createGameObject(gameState.getPlayer(), PLAYER_IMAGE_PATH, 1.0));
+
+        //FIXME:
+
+        //root.getChildren().add(createGameObject(gameState.getPlayer(), PLAYER_IMAGE_PATH, 1.0));
+
+        playerImageView = createGameObject(gameState.getPlayer(), PLAYER_IMAGE_FULL, 1.0);
+        root.getChildren().add(playerImageView);
+
+        gameState.livesProperty().addListener((observable, oldValue, newValue) -> {
+            updatePlayerImage(newValue.intValue());
+        });
+
+        //FIXME:
+
+
 
         for (GameObject invader : gameState.getInvaders()) {
             root.getChildren().add(createGameObject(invader, INVADER_IMAGE_PATH, 1.0));
@@ -114,7 +133,25 @@ public class MainGameApp extends Application {
 
     }
 
+    private void updatePlayerImage(int lives) {
+        String imagePath;
+        switch (lives) {
+            case 3:
+                imagePath = PLAYER_IMAGE_FULL;
+                break;
+            case 2:
+                imagePath = PLAYER_IMAGE_DAMAGED;
+                break;
+            case 1:
+                imagePath = PLAYER_IMAGE_CRITICAL;
+                break;
+            default:
+                return; // Není potřeba měnit obrázek
+        }
 
+        Image newImage = new Image(getClass().getResourceAsStream(imagePath));
+        playerImageView.setImage(newImage);
+    }
 
 
 
@@ -180,7 +217,15 @@ public class MainGameApp extends Application {
         gameState.isInvaderKilled();
 
         //konec hry
-        if (!gameState.isPlayerKilled()) endGame("Game over", false);
+        //if (!gameState.isPlayerKilled()) endGame("Game over", false);
+        if (!gameState.isPlayerKilled()) {
+            updatePlayerImage(gameState.getLives());
+            if (gameState.getLives() <= 0) {
+                endGame("Game over", false);
+            }
+        }
+
+
         killedAllInvaders();
         isInvadersWon();
 
@@ -289,5 +334,6 @@ public class MainGameApp extends Application {
 
         return wallShape;
     }
+
 
 }
