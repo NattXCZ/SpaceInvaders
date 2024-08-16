@@ -11,7 +11,7 @@ import java.util.Random;
 public class GameState {
 
     private ArrayList<GameObject> invaders = new ArrayList<GameObject>();
-    private  ArrayList<GameObject> invadersShoots = new ArrayList<GameObject>();
+    private ArrayList<GameObject> invadersShoots = new ArrayList<GameObject>();
     private ArrayList<GameObject> playerShoots = new ArrayList<GameObject>();
     private ArrayList<Wall> walls = new ArrayList<Wall>();
     private GameObject player;
@@ -29,10 +29,17 @@ public class GameState {
 
 
     private int PROJECTILE_SIZE = 4;
-    private int SPACE_SHIP_SIZE = 15;
+    //private int SPACE_SHIP_SIZE = 64;
+    //private int SPACE_SHIP_SIZE = 30;
+    private int ALIEN_SHIP_WIDTH = 64;
+    private int ALIEN_SHIP_HEIGHT = 48;
+
+    //TODO: zmenit
+    private int PLAYER_SHIP_WIDTH = 70;
+    private int PLAYER_SHIP_HEIGHT = 86;
 
     public GameState(){
-        player = new GameObject(350,650,SPACE_SHIP_SIZE);
+        player = new GameObject(350,650,PLAYER_SHIP_WIDTH,PLAYER_SHIP_HEIGHT);
         createAddInvaders();
         createAddWalls();
     }
@@ -42,28 +49,30 @@ public class GameState {
             walls.add(new Wall(550, w, 100, 20));
         }
     }
+    private void createAddInvaders() {
+        int startX = 50;  // počáteční X pozice pro první invader
+        int startY = 50;  // počáteční Y pozice pro první řádek
+        int spacingX = ALIEN_SHIP_WIDTH + 20;  // horizontální mezera mezi invadery
+        int spacingY = ALIEN_SHIP_HEIGHT + 20;  // vertikální mezera mezi řádky
 
-    public void createAddInvaders() {
-        makeRowInvaders(50,0);
-        makeRowInvaders(120,7);
-        makeRowInvaders(190, 14);
-        makeRowInvaders(260, 21);
-
-    }
-    public void makeRowInvaders(int row, int index){
-        for(int i = 0, w = 40; i < 7; i++, w += 70) {
-            invaders.add(new GameObject(w, row,SPACE_SHIP_SIZE));
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 6; col++) {
+                int x = startX + col * spacingX;
+                int y = startY + row * spacingY;
+                invaders.add(new GameObject(x, y, ALIEN_SHIP_WIDTH, ALIEN_SHIP_HEIGHT));
+            }
         }
     }
+
     //strileni
     public GameObject createProjectile(double x, double y){
-        GameObject newProjectile = new GameObject((int)x, (int)y,PROJECTILE_SIZE);
+        GameObject newProjectile = new GameObject((int)x, (int)y,PROJECTILE_SIZE, PROJECTILE_SIZE);
         SHOOTS_TO_ADD.add(newProjectile);
         return newProjectile;
     }
 
     public GameObject playerFire(){
-        GameObject projectile = createProjectile(player.getX(), player.getY()- player.getSize());
+        GameObject projectile = createProjectile(player.getRow(), player.getCol() - ((double) player.getWidth() / 2));
         playerShoots.add(projectile);
         return projectile;
     }
@@ -74,7 +83,10 @@ public class GameState {
 
     }
     public GameObject invaderFire(int index){
-        GameObject projectile  = createProjectile(invaders.get(index).getX(), invaders.get(index).getX() + invaders.get(index).getSize());
+        //GameObject projectile  = createProjectile(invaders.get(index).getRow(), invaders.get(index).getRow() + ((double) invaders.get(index).getWidth() / 2));
+        //System.out.println();
+        GameObject projectile  = createProjectile(invaders.get(index).getRow(), invaders.get(index).getCol() + ((double) invaders.get(index).getWidth() / 2));
+
         invadersShoots.add(projectile);
         return projectile;
     }
@@ -118,12 +130,12 @@ public class GameState {
     }
 
     public void moveLeft(){
-        int col = (int)getPlayer().getX();
-        if (col > 0) getPlayer().setX(col - PLAYER_MOVE_SIZE);
+        int col = (int)getPlayer().getRow();
+        if (col > 0) getPlayer().setRow(col - PLAYER_MOVE_SIZE);
     }
     public void moveRight(){
-        int col = (int)getPlayer().getX();
-        if (col < 700) getPlayer().setX(col + PLAYER_MOVE_SIZE);
+        int col = (int)getPlayer().getRow();
+        if (col < 700) getPlayer().setRow(col + PLAYER_MOVE_SIZE);
 
     }
     public void isWallDestroied(){
@@ -166,30 +178,30 @@ public class GameState {
         double currCenterVal;
         if(moveRight){ //do prava
             for (GameObject invader : getInvaders()) {
-                currCenterVal = invader.getX();
-                invader.setX((int)currCenterVal + INVADER_MOVE_SIDE);
+                currCenterVal = invader.getRow();
+                invader.setRow((int)currCenterVal + INVADER_MOVE_SIDE);
             }
             numberForMove = numberForMove + 1;
         }
         else{//do leva
             for (GameObject invader : getInvaders()) {
-                currCenterVal = invader.getX();
-                invader.setX((int)currCenterVal - INVADER_MOVE_SIDE);
+                currCenterVal = invader.getRow();
+                invader.setRow((int)currCenterVal - INVADER_MOVE_SIDE);
             }
             numberForMove = numberForMove - 1;
         }
         if(numberForMove >= 12){
             moveRight = false;
             for (GameObject invader : getInvaders()) {
-                currCenterVal = invader.getY();
-                invader.setY((int)currCenterVal + INVADER_JUMP_COL);
+                currCenterVal = invader.getCol();
+                invader.setCol((int)currCenterVal + INVADER_JUMP_COL);
             }
         }
         else if(numberForMove <= 0){
             moveRight = true;
             for (GameObject invader : getInvaders()) {
-                currCenterVal = invader.getY();
-                invader.setY((int)currCenterVal + INVADER_JUMP_COL);
+                currCenterVal = invader.getCol();
+                invader.setCol((int)currCenterVal + INVADER_JUMP_COL);
             }
         }
     }
@@ -199,26 +211,69 @@ public class GameState {
     public boolean isProjectileInWall(Wall wall,GameObject projectile){
         double width = wall.getWidth();
         double height = wall.getHeight();
-        boolean isHit = (wall.getColumn() <= projectile.getX() && projectile.getX() <= (wall.getColumn() + width))  //x
-                && (wall.getRow() <= projectile.getY() && projectile.getY() <= (wall.getRow() + height));   //y
+        boolean isHit = (wall.getColumn() <= projectile.getRow() && projectile.getRow() <= (wall.getColumn() + width))  //x
+                && (wall.getRow() <= projectile.getCol() && projectile.getCol() <= (wall.getRow() + height));   //y
         return isHit;
     }
 
-    private boolean isBetween( double from, double to, double find){
-        if (from <= find && find <= to) {
-            return true;
+
+    public boolean isProjectileInSpaceShip(GameObject ship, GameObject projectile) {
+        /*
+        double shipX = ship.getRow();
+        double shipY = ship.getCol();
+        double shipWidth = ship.getWidth();
+        double shipHeight = ship.getHeight();
+
+        double projectileX = projectile.getRow();
+        double projectileY = projectile.getCol();
+
+        // Kontrola, zda je střela v horizontálním rozsahu lodi
+        boolean isInHorizontalRange = isBetween(shipX, shipX + shipWidth, projectileX);
+
+        // Kontrola, zda je střela ve spodní polovině lodi
+        boolean isInBottomHalf = isBetween(shipY + shipHeight / 2, shipY + shipHeight, projectileY);
+
+
+
+        if(isInHorizontalRange && isInBottomHalf){
+            System.out.println("--------------");
+            System.out.println(shipX);
+            System.out.println(shipY);
+            System.out.println(shipWidth);
+            System.out.println(shipHeight);
+            System.out.println("--------------");
         }
-        return false;
+        return isInHorizontalRange && isInBottomHalf;
+
+         */
+        double shipWidth = ship.getWidth();
+        double shipHeight = ship.getHeight();
+
+
+
+
+
+        boolean isHit = isBetween(ship.getRow() - shipWidth / 2, ship.getRow() + shipWidth / 2, projectile.getRow())
+                && isBetween(ship.getCol() - shipHeight / 2, ship.getCol() + shipHeight / 2, projectile.getCol());
+
+
+
+        /*
+        boolean isHit = isBetween(ship.getRow(), ship.getRow() + shipWidth, projectile.getRow())
+                && isBetween(ship.getCol() + shipHeight / 2, ship.getCol() + shipHeight, projectile.getCol());
+
+
+         */
+        return isHit;
+
+
+
     }
 
-    public boolean isProjectileInSpaceShip(GameObject ship , GameObject projectile){
-        if(!ship.activeProperty().getValue()){
-            return false;
-        }
-        double radius = ship.getSize();
-        boolean isHit = isBetween(ship.getX() - radius, ship.getX() + radius, projectile.getX())
-                && isBetween(ship.getY() - radius, ship.getY() + radius, projectile.getY());
-        return isHit;
+
+
+    private boolean isBetween(double min, double max, double value) {
+        return value >= min && value <= max;
     }
 
     //gettery

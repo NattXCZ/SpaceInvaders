@@ -17,7 +17,7 @@ public class Wall{
 
     public Wall(int row, int column, int width, int height) {
         this.active = new SimpleBooleanProperty(true);
-        this.lives  =  new SimpleIntegerProperty(3);
+        this.lives  =  new SimpleIntegerProperty(8);
         this.column = new SimpleIntegerProperty(column);   //x
         this.row = new SimpleIntegerProperty(row);   //y
         this.width = new SimpleIntegerProperty(width);
@@ -26,8 +26,8 @@ public class Wall{
 
     public void minusLive(){
         this.setLives( getLives() - 1);
-        this.setWidth(getWidth() - 5);
-        this.setHeight(getHeight() - 5);
+        this.setWidth(getWidth() - 10);
+        this.setColumn(getColumn() + 5);
 
         if(getLives() <= 0) setActive(false);
     }
