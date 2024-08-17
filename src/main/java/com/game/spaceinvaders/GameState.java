@@ -2,7 +2,9 @@ package com.game.spaceinvaders;
 
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class GameState {
     private int ALIEN_SHIP_WIDTH = 64;
     private int ALIEN_SHIP_HEIGHT = 48;
 
-    //TODO: zmenit
+
     private int PLAYER_SHIP_WIDTH = 70;
     private int PLAYER_SHIP_HEIGHT = 86;
 
@@ -43,6 +45,7 @@ public class GameState {
         createAddInvaders();
         createAddWalls();
     }
+
 
     public void createAddWalls(){
         for(int i = 0, w = 60; i < 4; i++, w = w + 150) {

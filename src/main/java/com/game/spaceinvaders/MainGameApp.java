@@ -1,29 +1,24 @@
 package com.game.spaceinvaders;
 
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-
-
-
-
 
 import java.util.List;
 
@@ -31,8 +26,8 @@ public class MainGameApp extends Application {
     //TODO: size playera a size invaders musíme nastavit podle obrázku na jeho sirku
     //TODO: a esi strela potka spodek aliena
 
+    private static String font =  "Impact";//"Berlin Sans FB Demi Bold";
 
-    private static final String PLAYER_IMAGE_PATH = "/com/game/spaceinvaders/ship70x86.png";
     private static final String INVADER_IMAGE_PATH = "/com/game/spaceinvaders/alien64x48.png";
 
     private static final String PLAYER_IMAGE_FULL = "/com/game/spaceinvaders/ship70x86.png";
@@ -40,9 +35,13 @@ public class MainGameApp extends Application {
     private static final String PLAYER_IMAGE_CRITICAL = "/com/game/spaceinvaders/ship70x86dmg3.png";
 
     private ImageView playerImageView;
+    private ColorAdjust grayScale;
+    private Text countdownText;
+    private PauseTransition countdownPause;
+    private boolean isCountingDown = false;
 
 
-
+    private Scene gameScene;
     private Timeline timeLine;
     private Timeline timeLineInvaderShoot;
     private static final int DELAY = 20; // ms   ///100
@@ -66,14 +65,168 @@ public class MainGameApp extends Application {
 
     //TODO:zivoty u invaderu v prvni linii a menici se obrazky
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        // Vytvoření kořenového Pane
+        Pane root = new Pane();
+        root.setPrefSize(700, 700);
+        root.setStyle("-fx-background-color: black;");
+
+        // Vytvoření textu "Space Invaders"
+        Text titleText = new Text("Space Invaders");
+        titleText.setFill(Color.web("#fff236"));
+        titleText.setFont(Font.font(font, 75));
+        titleText.setTextAlignment(TextAlignment.CENTER);
+        titleText.setWrappingWidth(592.46875);
+        titleText.setLayoutX(54);
+        titleText.setLayoutY(333);
+
+        // Vytvoření tlačítka PLAY
+        Button playButton = new Button("PLAY");
+        playButton.setLayoutX(267);
+        playButton.setLayoutY(471);
+        playButton.setPrefSize(166, 56);
+        playButton.setStyle("-fx-border-color: white; -fx-background-color: black;");
+        playButton.setTextFill(Color.WHITE);
+        playButton.setFont(Font.font(font, 25));
+
+        // Nastavení akce pro tlačítko PLAY
+        playButton.setOnAction(e -> {
+            startGame(primaryStage);
+        });
+
+        // Přidání prvků do kořenového Pane
+        root.getChildren().addAll(titleText, playButton);
+
+        // Vytvoření scény
+        Scene mainMenuScene = new Scene(root, 700, 700);
+        mainMenuScene.setFill(Color.BLACK);
+
+        // Nastavení scény pro primaryStage
+        primaryStage.setScene(mainMenuScene);
+        primaryStage.setTitle("Space Invaders");
+        primaryStage.show();
+    }
+
+    private void showPauseMenu(Stage primaryStage) {
+        if (isCountingDown) {
+            stopCountdown();
+        }
+
+
+        // Vytvoření kořenového Pane
+        Pane root = new Pane();
+        root.setPrefSize(700, 700);
+        root.setStyle("-fx-background-color: black;");
+
+        // Vytvoření textu "Game paused"
+        Text pausedText = new Text("Game paused");
+        pausedText.setFill(Color.WHITE);
+        pausedText.setFont(Font.font(font, 63));
+        pausedText.setTextAlignment(TextAlignment.CENTER);
+        pausedText.setWrappingWidth(446.13671875);
+        pausedText.setLayoutX(127);
+        pausedText.setLayoutY(178);
+
+        // Vytvoření tlačítka CONTINUE
+        Button continueButton = createButton("CONTINUE", 267, 244, 166, 56);
+
+        // Vytvoření tlačítka NEW GAME
+        Button newGameButton = createButton("NEW GAME", 259, 350, 182, 56);
+
+        // Vytvoření tlačítka EXIT
+        Button exitButton = createButton("EXIT", 267, 463, 166, 56);
+
+        // Nastavení akcí pro tlačítka
+        continueButton.setOnAction(e -> {
+            primaryStage.setScene(gameScene);
+            resumeGame();
+        });
+        newGameButton.setOnAction(e -> {
+            startGame(primaryStage);
+        });
+
+        exitButton.setOnAction(e -> {
+            primaryStage.close();
+        });
+
+
+
+        // Přidání prvků do kořenového Pane
+        root.getChildren().addAll(pausedText, continueButton, newGameButton, exitButton);
+
+        // Vytvoření scény
+        Scene pauseScene = new Scene(root, 700, 700);
+        pauseScene.setFill(Color.BLACK);
+
+        // Nastavení scény pro primaryStage
+        primaryStage.setScene(pauseScene);
+    }
+
+    // Pomocná metoda pro vytvoření tlačítka
+    private Button createButton(String text, double x, double y, double width, double height) {
+        Button button = new Button(text);
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+        button.setPrefSize(width, height);
+        button.setStyle("-fx-border-color: white; -fx-background-color: black;");
+        button.setTextFill(Color.WHITE);
+        button.setFont(Font.font(font, 25));
+        return button;
+    }
+    private void resumeGame() {
+        if (isCountingDown) {
+            stopCountdown();
+        }
+        isCountingDown = true;
+        grayScale = new ColorAdjust();
+        grayScale.setSaturation(-1.0);
+        root.setEffect(grayScale);
+
+        countdownText = new Text();
+        countdownText.setFont(Font.font(font, 100));
+        countdownText.setFill(Color.WHITE);
+        countdownText.setX(325);
+        countdownText.setY(350);
+        root.getChildren().add(countdownText);
+
+        startCountdown(3);
+    }
+
+    private void startCountdown(int count) {
+        if (count > 0 && isCountingDown) {
+            countdownText.setText(Integer.toString(count));
+            countdownPause = new PauseTransition(Duration.seconds(1));
+            countdownPause.setOnFinished(event -> startCountdown(count - 1));
+            countdownPause.play();
+        } else if (isCountingDown) {
+            stopCountdown();
+            if (timeLine != null) timeLine.play();
+            if (timeLineInvaderShoot != null) timeLineInvaderShoot.play();
+        }
+    }
+    private void stopCountdown() {
+        isCountingDown = false;
+        if (countdownPause != null) {
+            countdownPause.stop();
+        }
+        root.getChildren().remove(countdownText);
+        root.setEffect(null);
+    }
+    private void pauseGame() {
+        if (isCountingDown) {
+            stopCountdown();
+        }
+        if (timeLine != null) timeLine.pause();
+        if (timeLineInvaderShoot != null) timeLineInvaderShoot.pause();
+    }
+
+
+    private void startGame(Stage primaryStage) {
+        // Initialize the game
         gameState = new GameState();
+        root = new Pane();
+        root.setStyle("-fx-background-color: black;");
         manageTexts();
-
-
-        //FIXME:
-
-        //root.getChildren().add(createGameObject(gameState.getPlayer(), PLAYER_IMAGE_PATH, 1.0));
 
         playerImageView = createGameObject(gameState.getPlayer(), PLAYER_IMAGE_FULL, 1.0);
         root.getChildren().add(playerImageView);
@@ -82,17 +235,34 @@ public class MainGameApp extends Application {
             updatePlayerImage(newValue.intValue());
         });
 
-        //FIXME:
-
-
-
         for (GameObject invader : gameState.getInvaders()) {
             root.getChildren().add(createGameObject(invader, INVADER_IMAGE_PATH, 1.0));
         }
-        for (Wall wall:gameState.getWalls()) {
+        for (Wall wall : gameState.getWalls()) {
             root.getChildren().add(createWall(wall, wallColor));
         }
 
+        setupGameTimelines();
+
+        // Create and set the game scene
+        gameScene = new Scene(root, 700, 700);
+        gameScene.setFill(Color.BLACK);
+        gameScene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                pauseGame();
+                showPauseMenu(primaryStage);
+            } else {
+                dispatchKeyEvents(e);
+            }
+        });
+        gameScene.setOnKeyReleased(this::dispatchKeyEventsShoot);
+
+        primaryStage.setScene(gameScene);
+
+
+    }
+
+    private void setupGameTimelines() {
         timeLine = new Timeline();
         KeyFrame updates = new KeyFrame(
                 Duration.millis(DELAY),
@@ -104,7 +274,6 @@ public class MainGameApp extends Application {
         timeLine.setCycleCount(Animation.INDEFINITE);
         timeLine.play();
 
-        //strileni monster
         timeLineInvaderShoot = new Timeline();
         KeyFrame updatesInvaderShoot = new KeyFrame(
                 Duration.millis(FAST_SHOOT_INVADER),
@@ -121,16 +290,6 @@ public class MainGameApp extends Application {
         timeLineInvaderShoot.getKeyFrames().add(updatesInvaderShoot);
         timeLineInvaderShoot.setCycleCount(Animation.INDEFINITE);
         timeLineInvaderShoot.play();
-
-        //okno
-        Scene scene = new Scene(root, 700, 700);  //800
-        scene.setFill(Color.BLACK);
-        scene.setOnKeyPressed(this::dispatchKeyEvents);
-        scene.setOnKeyReleased(this::dispatchKeyEventsShoot);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Space Invaders");
-        primaryStage.show();
-
     }
 
     private void updatePlayerImage(int lives) {
@@ -303,6 +462,10 @@ public class MainGameApp extends Application {
         //zastavi hru
         timeLine.stop();
         timeLineInvaderShoot.stop();
+
+        //TODO: co to je
+        pauseGame();
+
     }
     private void killedAllInvaders(){
         if(gameState.getInvaders().stream().filter(item -> item.isActive()).findFirst().isEmpty()){
@@ -333,7 +496,8 @@ public class MainGameApp extends Application {
         wallShape.visibleProperty().bind(wall.activeProperty());
 
         return wallShape;
+
     }
-
-
 }
+
+
