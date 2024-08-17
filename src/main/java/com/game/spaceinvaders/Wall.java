@@ -5,21 +5,20 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-
 public class Wall{
 
 
     private final BooleanProperty active;
     private final IntegerProperty lives;
     private final IntegerProperty row;
-    private final IntegerProperty column;
+    private final IntegerProperty col;
     private final IntegerProperty width;
     private final IntegerProperty height;
 
-    public Wall(int row, int column, int width, int height) {
+    public Wall(int row, int col, int width, int height) {
         this.active = new SimpleBooleanProperty(true);
         this.lives  =  new SimpleIntegerProperty(8);
-        this.column = new SimpleIntegerProperty(column);   //x
+        this.col = new SimpleIntegerProperty(col);   //x
         this.row = new SimpleIntegerProperty(row);   //y
         this.width = new SimpleIntegerProperty(width);
         this.height = new SimpleIntegerProperty(height);
@@ -28,7 +27,7 @@ public class Wall{
     public void minusLive(){
         this.setLives( getLives() - 1);
         this.setWidth(getWidth() - 10);
-        this.setColumn(getColumn() + 5);
+        this.setCol(getCol() + 5);
 
         if(getLives() <= 0) setActive(false);
     }
@@ -57,14 +56,14 @@ public class Wall{
     }
 
     //col
-    public final IntegerProperty columnProperty() {
-        return this.column;
+    public final IntegerProperty colProperty() {
+        return this.col;
     }
-    public final int getColumn() {
-        return this.columnProperty().get();
+    public final int getCol() {
+        return this.colProperty().get();
     }
-    public final void setColumn(final int column) {
-        this.columnProperty().set(column);
+    public final void setCol(final int column) {
+        this.colProperty().set(column);
     }
 
     //height
@@ -101,3 +100,36 @@ public class Wall{
     }
 
 }
+/*
+public class Wall extends GameObject {
+
+    private final IntegerProperty lives;
+
+    public Wall(int row, int column, int width, int height) {
+        super(row, column, width, height);
+        this.lives = new SimpleIntegerProperty(8);
+    }
+
+    public void minusLive() {
+        this.setLives(getLives() - 1);
+        this.setWidth(getWidth() - 10);
+        this.setRow(getRow() + 5);
+
+        if (getLives() <= 0) setActive(false);
+    }
+
+    // lives
+    public final IntegerProperty livesProperty() {
+        return this.lives;
+    }
+
+    public final int getLives() {
+        return this.livesProperty().get();
+    }
+
+    public final void setLives(final int lives) {
+        this.livesProperty().set(lives);
+    }
+}
+
+ */

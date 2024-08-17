@@ -483,13 +483,13 @@ public class MainGameApp extends Application {
         return circleShape;
     }
     private Rectangle createWall(Wall wall, Color color) {
-        Rectangle wallShape = new Rectangle(wall.getRow(),wall.getColumn(), wall.getWidth(),wall.getHeight());
+        Rectangle wallShape = new Rectangle(wall.getRow(),wall.getCol(), wall.getWidth(),wall.getHeight());
 
-        if ((wall.getRow() + wall.getColumn()) % 2 == 0) wallShape.setFill(Color.DARKRED);
+        if ((wall.getRow() + wall.getCol()) % 2 == 0) wallShape.setFill(Color.DARKRED);
         else wallShape.setFill(color);
 
         // provazani vlastnosti
-        wallShape.xProperty().bind(wall.columnProperty());
+        wallShape.xProperty().bind(wall.colProperty());
         wallShape.yProperty().bind(wall.rowProperty());
         wallShape.widthProperty().bind(wall.widthProperty());
         wallShape.heightProperty().bind(wall.heightProperty());

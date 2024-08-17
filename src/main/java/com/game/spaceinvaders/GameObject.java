@@ -61,20 +61,6 @@ public class GameObject {
         this.activeProperty().set(active);
     }
 
-
-    //size
-
-    /*public final IntegerProperty sizeProperty() {
-        return this.size;
-    }
-    public final int getSize() {
-        return this.sizeProperty().get();
-    }
-    public final void setSize(final int size) {
-        this.sizeProperty().set(size);
-    }
-    */
-
     //height
     public final IntegerProperty heightProperty() {
         return this.height;

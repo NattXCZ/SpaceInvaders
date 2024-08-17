@@ -214,7 +214,7 @@ public class GameState {
     public boolean isProjectileInWall(Wall wall,GameObject projectile){
         double width = wall.getWidth();
         double height = wall.getHeight();
-        boolean isHit = (wall.getColumn() <= projectile.getRow() && projectile.getRow() <= (wall.getColumn() + width))  //x
+        boolean isHit = (wall.getCol() <= projectile.getRow() && projectile.getRow() <= (wall.getCol() + width))  //x
                 && (wall.getRow() <= projectile.getCol() && projectile.getCol() <= (wall.getRow() + height));   //y
         return isHit;
     }
