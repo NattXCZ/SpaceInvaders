@@ -21,25 +21,20 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainGameApp extends Application {
-    //TODO: size playera a size invaders musíme nastavit podle obrázku na jeho sirku
-    //TODO: a esi strela potka spodek aliena
-
-    private static String font =  "Impact";//"Berlin Sans FB Demi Bold";
+    private static final String font =  "Impact";
 
     private static final String INVADER_IMAGE_PATH = "/com/game/spaceinvaders/alien64x48.png";
-
     private static final String PLAYER_IMAGE_FULL = "/com/game/spaceinvaders/ship70x86.png";
     private static final String PLAYER_IMAGE_DAMAGED = "/com/game/spaceinvaders/ship70x86dmg2.png";
     private static final String PLAYER_IMAGE_CRITICAL = "/com/game/spaceinvaders/ship70x86dmg3.png";
-
     private ImageView playerImageView;
-    private ColorAdjust grayScale;
+
     private Text countdownText;
     private PauseTransition countdownPause;
     private boolean isCountingDown = false;
-
 
     private Scene gameScene;
     private Timeline timeLine;
@@ -47,31 +42,22 @@ public class MainGameApp extends Application {
     private static final int DELAY = 20; // ms   ///100
     private static final int FAST_SHOOT_INVADER = 2000; //ms
 
-    private Color playerColor = Color.CADETBLUE;
-    private Color invaderColor = Color.DARKRED;
-    private Color wallColor = Color.RED;
-    private Color projectileColor = Color.YELLOWGREEN;
+    private final Color wallColor = Color.RED;
+    private final Color projectileColor = Color.YELLOWGREEN;
 
     private Pane root = new Pane();
-
-    private Text txtLives;
-    private Text txtPoints;
     private GameState gameState;
 
     public static void main(String[] args) {
         launch(args);
     }
 
-
-    //TODO:zivoty u invaderu v prvni linii a menici se obrazky
     @Override
     public void start(Stage primaryStage) {
-        // Vytvoření kořenového Pane
         Pane root = new Pane();
         root.setPrefSize(700, 700);
         root.setStyle("-fx-background-color: black;");
 
-        // Vytvoření textu "Space Invaders"
         Text titleText = new Text("Space Invaders");
         titleText.setFill(Color.web("#fff236"));
         titleText.setFont(Font.font(font, 75));
@@ -80,7 +66,6 @@ public class MainGameApp extends Application {
         titleText.setLayoutX(54);
         titleText.setLayoutY(333);
 
-        // Vytvoření tlačítka PLAY
         Button playButton = new Button("PLAY");
         playButton.setLayoutX(267);
         playButton.setLayoutY(471);
@@ -89,19 +74,15 @@ public class MainGameApp extends Application {
         playButton.setTextFill(Color.WHITE);
         playButton.setFont(Font.font(font, 25));
 
-        // Nastavení akce pro tlačítko PLAY
         playButton.setOnAction(e -> {
             startGame(primaryStage);
         });
 
-        // Přidání prvků do kořenového Pane
         root.getChildren().addAll(titleText, playButton);
 
-        // Vytvoření scény
         Scene mainMenuScene = new Scene(root, 700, 700);
         mainMenuScene.setFill(Color.BLACK);
 
-        // Nastavení scény pro primaryStage
         primaryStage.setScene(mainMenuScene);
         primaryStage.setTitle("Space Invaders");
         primaryStage.show();
@@ -112,13 +93,10 @@ public class MainGameApp extends Application {
             stopCountdown();
         }
 
-
-        // Vytvoření kořenového Pane
         Pane root = new Pane();
         root.setPrefSize(700, 700);
         root.setStyle("-fx-background-color: black;");
 
-        // Vytvoření textu "Game paused"
         Text pausedText = new Text("Game paused");
         pausedText.setFill(Color.WHITE);
         pausedText.setFont(Font.font(font, 63));
@@ -127,16 +105,12 @@ public class MainGameApp extends Application {
         pausedText.setLayoutX(127);
         pausedText.setLayoutY(178);
 
-        // Vytvoření tlačítka CONTINUE
         Button continueButton = createButton("CONTINUE", 267, 244, 166, 56);
 
-        // Vytvoření tlačítka NEW GAME
         Button newGameButton = createButton("NEW GAME", 259, 350, 182, 56);
 
-        // Vytvoření tlačítka EXIT
         Button exitButton = createButton("EXIT", 267, 463, 166, 56);
 
-        // Nastavení akcí pro tlačítka
         continueButton.setOnAction(e -> {
             primaryStage.setScene(gameScene);
             resumeGame();
@@ -149,20 +123,14 @@ public class MainGameApp extends Application {
             primaryStage.close();
         });
 
-
-
-        // Přidání prvků do kořenového Pane
         root.getChildren().addAll(pausedText, continueButton, newGameButton, exitButton);
 
-        // Vytvoření scény
         Scene pauseScene = new Scene(root, 700, 700);
         pauseScene.setFill(Color.BLACK);
 
-        // Nastavení scény pro primaryStage
         primaryStage.setScene(pauseScene);
     }
 
-    // Pomocná metoda pro vytvoření tlačítka
     private Button createButton(String text, double x, double y, double width, double height) {
         Button button = new Button(text);
         button.setLayoutX(x);
@@ -178,7 +146,7 @@ public class MainGameApp extends Application {
             stopCountdown();
         }
         isCountingDown = true;
-        grayScale = new ColorAdjust();
+        ColorAdjust grayScale = new ColorAdjust();
         grayScale.setSaturation(-1.0);
         root.setEffect(grayScale);
 
@@ -204,6 +172,7 @@ public class MainGameApp extends Application {
             if (timeLineInvaderShoot != null) timeLineInvaderShoot.play();
         }
     }
+
     private void stopCountdown() {
         isCountingDown = false;
         if (countdownPause != null) {
@@ -212,6 +181,7 @@ public class MainGameApp extends Application {
         root.getChildren().remove(countdownText);
         root.setEffect(null);
     }
+
     private void pauseGame() {
         if (isCountingDown) {
             stopCountdown();
@@ -222,13 +192,12 @@ public class MainGameApp extends Application {
 
 
     private void startGame(Stage primaryStage) {
-        // Initialize the game
         gameState = new GameState();
         root = new Pane();
         root.setStyle("-fx-background-color: black;");
         manageTexts();
 
-        playerImageView = createGameObject(gameState.getPlayer(), PLAYER_IMAGE_FULL, 1.0);
+        playerImageView = createGameObject(gameState.getPlayer(), PLAYER_IMAGE_FULL);
         root.getChildren().add(playerImageView);
 
         gameState.livesProperty().addListener((observable, oldValue, newValue) -> {
@@ -236,7 +205,7 @@ public class MainGameApp extends Application {
         });
 
         for (GameObject invader : gameState.getInvaders()) {
-            root.getChildren().add(createGameObject(invader, INVADER_IMAGE_PATH, 1.0));
+            root.getChildren().add(createGameObject(invader, INVADER_IMAGE_PATH));
         }
         for (Wall wall : gameState.getWalls()) {
             root.getChildren().add(createWall(wall, wallColor));
@@ -244,7 +213,6 @@ public class MainGameApp extends Application {
 
         setupGameTimelines();
 
-        // Create and set the game scene
         gameScene = new Scene(root, 700, 700);
         gameScene.setFill(Color.BLACK);
         gameScene.setOnKeyPressed(e -> {
@@ -305,62 +273,44 @@ public class MainGameApp extends Application {
                 imagePath = PLAYER_IMAGE_CRITICAL;
                 break;
             default:
-                return; // Není potřeba měnit obrázek
+                return;
         }
 
-        Image newImage = new Image(getClass().getResourceAsStream(imagePath));
+        Image newImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         playerImageView.setImage(newImage);
     }
 
-
-
-
-    ////
-
-    private ImageView createGameObject(GameObject ship, String imagePath, double scale) {
-        Image image = new Image(getClass().getResourceAsStream(imagePath));
+    private ImageView createGameObject(GameObject ship, String imagePath) {
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         if (image.isError()) {
             System.err.println("Error loading image: " + imagePath);
-            return new ImageView(); // Return empty ImageView if image fails to load
+            return new ImageView();
         }
         ImageView imageView = new ImageView(image);
 
         // Centrování obrázku na pozici herního objektu
-        imageView.xProperty().bind(ship.rowProperty().subtract((image.getWidth() * scale) / 2));
-        imageView.yProperty().bind(ship.colProperty().subtract((image.getWidth() * scale) / 2));
-
-
-
+        imageView.xProperty().bind(ship.rowProperty().subtract(image.getWidth() / 2));
+        imageView.yProperty().bind(ship.colProperty().subtract(image.getWidth() / 2));
         imageView.visibleProperty().bind(ship.activeProperty());
 
-        // Zvětšení obrázku
-        //imageView.setScaleX(scale);
-        //imageView.setScaleY(scale);
-
-        System.out.println(imagePath);
-        System.out.println(image.getWidth());
-        System.out.println(image.getHeight());
         return imageView;
     }
-    /////
+
     private void manageTexts(){
-        // Lives
         Text txtLblLives = new Text("Lives: ");
         manageOneTextLb(txtLblLives, 10, 30);
 
-        txtLives = new Text(Integer.toString(gameState.getLives()));
+        Text txtLives = new Text(Integer.toString(gameState.getLives()));
         manageOneTextLb(txtLives, 70, 30);
         txtLives.textProperty().bind(gameState.livesProperty().asString());
 
-        // Points
         Text txtLblPoints = new Text("Points: ");
         manageOneTextLb(txtLblPoints, 570, 30);
 
-        txtPoints = new Text(Integer.toString(gameState.getScore()));
+        Text txtPoints = new Text(Integer.toString(gameState.getScore()));
         manageOneTextLb(txtPoints, 640, 30);
         txtPoints.textProperty().bind(gameState.scoreProperty().asString());
 
-        // Přidání všech textových prvků do root
         root.getChildren().addAll(txtLblLives, txtLives, txtLblPoints, txtPoints);
 
     }
@@ -372,11 +322,8 @@ public class MainGameApp extends Application {
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
     }
     public void gameUpdate() {
-        //eliminace nepratel
         gameState.isInvaderKilled();
 
-        //konec hry
-        //if (!gameState.isPlayerKilled()) endGame("Game over", false);
         if (!gameState.isPlayerKilled()) {
             updatePlayerImage(gameState.getLives());
             if (gameState.getLives() <= 0) {
@@ -384,24 +331,19 @@ public class MainGameApp extends Application {
             }
         }
 
-
         killedAllInvaders();
         isInvadersWon();
 
-        //invaders
         shootsUpdate(gameState.getInvadersShoots(),3);
 
-        //player
         shootsUpdate(gameState.getPlayerShoots(),-3);
-        gameState.isWallDestroied();
+        gameState.isWallDestroyed();
 
-
-        //odstrani strely
-        for (GameObject circle : gameState.SHOOTS_TO_REMOVE) {
-            root.getChildren().remove(circle);
+        for (GameObject object : gameState.SHOOTS_TO_REMOVE) {
+            root.getChildren().remove(object);
         }
         gameState.SHOOTS_TO_REMOVE.clear();
-        //prida strely
+
         for (GameObject circle : gameState.SHOOTS_TO_ADD) {
             root.getChildren().add(createProjectile(circle, projectileColor));
         }
@@ -409,25 +351,23 @@ public class MainGameApp extends Application {
 
     }
     private void isInvadersWon(){
-        GameObject circ = gameState.getInvaders().stream().filter(item -> item.getCol() >= 600  && item.activeProperty().getValue()).findAny().orElse(null);  //735
-        if(circ != null){
+        GameObject object = gameState.getInvaders().stream().filter(item -> item.getCol() >= 600
+                && item.activeProperty().getValue()).findAny().orElse(null);
+        if(object != null){
             endGame("Game over", false);
         }
     }
-
 
     private void dispatchKeyEvents(KeyEvent e) {
         switch (e.getCode()) {
             case LEFT:  gameState.moveLeft(); break;
             case RIGHT: gameState.moveRight(); break;
-            //       case SPACE: gameState.playerFire(root); break;
             default:
         }
     }
     private void dispatchKeyEventsShoot(KeyEvent e) {
-        switch (e.getCode()) {
-            case SPACE: gameState.playerFire(); break;
-            default:
+        if (Objects.requireNonNull(e.getCode()) == KeyCode.SPACE) {
+            gameState.playerFire();
         }
     }
 
@@ -458,17 +398,14 @@ public class MainGameApp extends Application {
         root.getChildren().add(text);
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 50));
 
-
-        //zastavi hru
         timeLine.stop();
         timeLineInvaderShoot.stop();
 
-        //TODO: co to je
         pauseGame();
 
     }
     private void killedAllInvaders(){
-        if(gameState.getInvaders().stream().filter(item -> item.isActive()).findFirst().isEmpty()){
+        if(gameState.getInvaders().stream().filter(GameObject::isActive).findFirst().isEmpty()){
             endGame("You win", true);
         }
     }
@@ -482,13 +419,13 @@ public class MainGameApp extends Application {
         circleShape.setFill(color);
         return circleShape;
     }
+
     private Rectangle createWall(Wall wall, Color color) {
         Rectangle wallShape = new Rectangle(wall.getRow(),wall.getCol(), wall.getWidth(),wall.getHeight());
 
         if ((wall.getRow() + wall.getCol()) % 2 == 0) wallShape.setFill(Color.DARKRED);
         else wallShape.setFill(color);
 
-        // provazani vlastnosti
         wallShape.xProperty().bind(wall.colProperty());
         wallShape.yProperty().bind(wall.rowProperty());
         wallShape.widthProperty().bind(wall.widthProperty());
