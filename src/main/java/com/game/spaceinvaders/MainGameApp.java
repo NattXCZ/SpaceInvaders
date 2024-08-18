@@ -207,7 +207,7 @@ public class MainGameApp extends Application {
 
     private void killedAllInvaders(){
         if(gameState.getInvaders().stream().filter(GameObject::isActive).findFirst().isEmpty()){
-            endGame("You win", true);
+            endGame("You won", true);
         }
     }
 
@@ -285,7 +285,7 @@ public class MainGameApp extends Application {
 
         String menuText;
         if (isGameOver) {
-            menuText = isWin ? "Congrats" : "Game Over";
+            menuText = isWin ? "Congratulations!" : "Game Over";
         } else {
             menuText = "Game paused";
         }
