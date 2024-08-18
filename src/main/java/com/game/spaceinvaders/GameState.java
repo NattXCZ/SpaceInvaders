@@ -102,7 +102,6 @@ public class GameState {
         return value >= min && value <= max;
     }
 
-    //TODO: zjedondušit metody
     public boolean isPlayerKilled() {
         for (GameObject shoot: invadersShoots) {
             if(isProjectileInSpaceShip(player,shoot)){
